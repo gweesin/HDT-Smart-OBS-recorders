@@ -4,6 +4,7 @@ using System.Windows.Media;
 using Hearthstone_Deck_Tracker.API;
 using Hearthstone_Deck_Tracker.Plugins;
 using ToastManager = Hearthstone_Deck_Tracker.Utility.Toasts.ToastManager;
+using Hearthstone_Deck_Tracker.Utility.Logging;
 
 namespace RecorderPlugin
 {
@@ -61,13 +62,15 @@ namespace RecorderPlugin
             {
                 Recorder.Connect();
             }
-            catch (Recorder.ConnectionFailedException)
+            catch (Recorder.ConnectionFailedException ex)
             {
+                Log.Error(ex.Message);
                 ToastManager.ShowCustomToast(Toasts.MakeErrorToast("Connection to OBS failed!"));
                 return false;
             }
-            catch (Recorder.AuthorizationFailedException)
+            catch (Recorder.AuthorizationFailedException ex)
             {
+                Log.Error(ex.Message);
                 ToastManager.ShowCustomToast(Toasts.MakeErrorToast("Invalid password!"));
                 return false;
             }

@@ -1,6 +1,7 @@
 ﻿using OBSWebsocketDotNet;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace RecorderPlugin
 {
@@ -21,7 +22,7 @@ namespace RecorderPlugin
         private string ConnectionString = String.Empty;
         private string Password = String.Empty;
 
-        public void Connect()
+        public async void Connect()
         {
             try
             {
@@ -32,6 +33,7 @@ namespace RecorderPlugin
                 throw new AuthorizationFailedException();
             }
 
+            await Task.Delay(3000); // wait 3 sec to promise success because OBS.ConnectAsync is an async function but not awaitable
             if (!OBS.IsConnected)
             {
                 throw new ConnectionFailedException();
