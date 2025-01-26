@@ -15,6 +15,11 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <FodyWeaversXml>Weavers.xml</FodyWeaversXml>
+  </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -33,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.0.0" />
     <Reference Include="HearthDb">
       <HintPath>..\Hearthstone Deck Tracker\HearthDb.dll</HintPath>
       <Private>False</Private>
