@@ -11,8 +11,13 @@ namespace RecorderPlugin
         private Uri serverUri;
         private string Password = string.Empty;
 
-        public class ConnectionFailedException : Exception { }
-        public class AuthorizationFailedException : Exception { }
+        public class ConnectionFailedException : Exception
+        {
+        }
+
+        public class AuthorizationFailedException : Exception
+        {
+        }
 
         private long NextStopTime = 0;
 
@@ -99,7 +104,8 @@ namespace RecorderPlugin
             if (websocket != null && websocket.State == WebSocketState.Open)
             {
                 var message = Encoding.UTF8.GetBytes(command);
-                websocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
+                websocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true,
+                    CancellationToken.None).Wait();
             }
         }
     }
