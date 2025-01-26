@@ -1,33 +1,45 @@
-﻿using OBSWebsocketDotNet;
-using System;
+﻿using System;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
 
 namespace RecorderPlugin
 {
     internal class Recorder
     {
+        private ClientWebSocket websocket;
+        private Uri serverUri;
+        private string Password = string.Empty;
+
         public class ConnectionFailedException : Exception { }
-
         public class AuthorizationFailedException : Exception { }
-
-        OBSWebsocket OBS = new OBSWebsocket();
 
         private long NextStopTime = 0;
 
         private string ConnectionString = String.Empty;
-        private string Password = String.Empty;
 
         public void Connect()
         {
             try
             {
-                OBS.Connect(ConnectionString, Password);
-            }
-            catch (AuthFailureException)
-            {
-                throw new AuthorizationFailedException();
-            }
+                websocket = new ClientWebSocket();
+                serverUri = new Uri(ConnectionString);
 
-            if (!OBS.IsConnected)
+                // If you have a password for WebSocket
+                if (!string.IsNullOrEmpty(Password))
+                {
+                    // You can send an authentication message here
+                    // This is a simplified example, and might need adjustments depending on OBS WebSocket protocol
+                }
+
+                websocket.ConnectAsync(serverUri, CancellationToken.None).Wait();
+
+                if (websocket.State != WebSocketState.Open)
+                {
+                    throw new ConnectionFailedException();
+                }
+            }
+            catch (Exception)
             {
                 throw new ConnectionFailedException();
             }
@@ -43,14 +55,12 @@ namespace RecorderPlugin
         {
             if (NextStopTime > 0)
             {
-                NextStopTime = 0;                
+                NextStopTime = 0;
                 StopRecording();
             }
 
-            if (OBS.IsConnected)
-            {
-                OBS.StartRecord();
-            }
+            // Send WebSocket command to start recording
+            SendCommand("StartRecording");
         }
 
         internal void StopAfter(long millis)
@@ -60,7 +70,10 @@ namespace RecorderPlugin
 
         internal void Unload()
         {
-            OBS.Disconnect();
+            if (websocket != null && websocket.State == WebSocketState.Open)
+            {
+                websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnect", CancellationToken.None).Wait();
+            }
         }
 
         internal void Update()
@@ -76,9 +89,16 @@ namespace RecorderPlugin
 
         private void StopRecording()
         {
-            if (OBS.IsConnected && OBS.GetRecordStatus().IsRecording)
+            // Send WebSocket command to stop recording
+            SendCommand("StopRecording");
+        }
+
+        private void SendCommand(string command)
+        {
+            if (websocket != null && websocket.State == WebSocketState.Open)
             {
-                OBS.StopRecord();
+                var message = Encoding.UTF8.GetBytes(command);
+                websocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
             }
         }
     }
