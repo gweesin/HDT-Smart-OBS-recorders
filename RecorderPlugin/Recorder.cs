@@ -72,7 +72,8 @@ namespace RecorderPlugin
         {
             if (websocket != null && websocket.State == WebSocketState.Open)
             {
-                websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnect", CancellationToken.None).Wait();
+                websocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Disconnect", CancellationToken.None)
+                    .Wait();
             }
         }
 
