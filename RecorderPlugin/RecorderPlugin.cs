@@ -18,7 +18,10 @@ namespace RecorderPlugin
         public string ButtonText => "Settings";
         public string Name => "Hearthstone OBS recorder";
         public string Author => "darksworm";
-        public string Description => "Starts recording in OBS when HS game begins and stops when the game ends. To use this you will need to install OBS and the obs-websocket plugin.";
+
+        public string Description =>
+            "Starts recording in OBS when HS game begins and stops when the game ends. To use this you will need to install OBS and the obs-websocket plugin.";
+
         public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
 
         public System.Windows.Controls.MenuItem MenuItem => null;
@@ -80,7 +83,7 @@ namespace RecorderPlugin
             GameEvents.OnGameStart.Add(Recorder.StartRecording);
             Connect();
         }
-        
+
         public void OnUnload()
         {
             Recorder.Unload();

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
+﻿using OBSWebsocketDotNet;
+using System;
+using System.Diagnostics;
 
 namespace RecorderPlugin
 {
     internal class Recorder
     {
-        private ClientWebSocket websocket;
-        private Uri serverUri;
-        private string Password = string.Empty;
-
         public class ConnectionFailedException : Exception
         {
         }
@@ -19,32 +14,25 @@ namespace RecorderPlugin
         {
         }
 
+        OBSWebsocket OBS = new OBSWebsocket();
+
         private long NextStopTime = 0;
 
         private string ConnectionString = String.Empty;
+        private string Password = String.Empty;
 
         public void Connect()
         {
             try
             {
-                websocket = new ClientWebSocket();
-                serverUri = new Uri(ConnectionString);
-
-                // If you have a password for WebSocket
-                if (!string.IsNullOrEmpty(Password))
-                {
-                    // You can send an authentication message here
-                    // This is a simplified example, and might need adjustments depending on OBS WebSocket protocol
-                }
-
-                websocket.ConnectAsync(serverUri, CancellationToken.None).Wait();
-
-                if (websocket.State != WebSocketState.Open)
-                {
-                    throw new ConnectionFailedException();
-                }
+                OBS.ConnectAsync(ConnectionString, Password);
             }
-            catch (Exception)
+            catch (AuthFailureException)
+            {
+                throw new AuthorizationFailedException();
+            }
+
+            if (!OBS.IsConnected)
             {
                 throw new ConnectionFailedException();
             }
@@ -64,8 +52,12 @@ namespace RecorderPlugin
                 StopRecording();
             }
 
-            // Send WebSocket command to start recording
-            SendCommand("StartRecording");
+            if (OBS.IsConnected)
+            {
+                Debug.WriteLine("About to start recording.");
+                OBS.StartRecord();
+                Debug.WriteLine("Recording started.");
+            }
         }
 
         internal void StopAfter(long millis)
@@ -75,11 +67,7 @@ namespace RecorderPlugin
 
         internal void Unload()
         {
-            if (websocket != null && websocket.State == WebSocketState.Open)
-            {
-                websocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Disconnect", CancellationToken.None)
-                    .Wait();
-            }
+            OBS.Disconnect();
         }
 
         internal void Update()
@@ -95,17 +83,11 @@ namespace RecorderPlugin
 
         private void StopRecording()
         {
-            // Send WebSocket command to stop recording
-            SendCommand("StopRecording");
-        }
-
-        private void SendCommand(string command)
-        {
-            if (websocket != null && websocket.State == WebSocketState.Open)
+            if (OBS.IsConnected && OBS.GetRecordStatus().IsRecording)
             {
-                var message = Encoding.UTF8.GetBytes(command);
-                websocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true,
-                    CancellationToken.None).Wait();
+                Debug.WriteLine("About to stop recording.");
+                OBS.StopRecord();
+                Debug.WriteLine("Recording stopped.");
             }
         }
     }
