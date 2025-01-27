@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Timers;
 using System.Windows.Media;
 using Hearthstone_Deck_Tracker.API;
 using Hearthstone_Deck_Tracker.Plugins;
@@ -12,13 +13,16 @@ namespace RecorderPlugin
     {
         private const int DELAY_AFTER_GAME_END_SECONDS = 10;
 
+        // setting idle threshold
+        private const int IDLE_TIME_THRESHOLD_SECONDS = 5;
         private readonly Recorder Recorder = new Recorder();
         private readonly SettingsDialog SettingsDialog;
         private readonly SettingStore SettingStore = new SettingStore();
+        private Timer idleTimer;
 
         public string ButtonText => "Settings";
         public string Name => "Hearthstone OBS recorder";
-        public string Author => "darksworm";
+        public string Author => "gweesin";
 
         public string Description =>
             "Starts recording in OBS when HS game begins and stops when the game ends. To use this you will need to install OBS and the obs-websocket plugin.";
@@ -41,6 +45,10 @@ namespace RecorderPlugin
             }
 
             SettingsDialog.SettingsChanged += OnSettingsChanged;
+
+            idleTimer = new Timer(IDLE_TIME_THRESHOLD_SECONDS * 1000);
+            idleTimer.Elapsed += OnIdleTimeElapsed;
+            idleTimer.AutoReset = false;
         }
 
         private void OnSettingsChanged(object _, SettingsDialog.SettingsChangedEvent e)
@@ -84,6 +92,9 @@ namespace RecorderPlugin
         {
             GameEvents.OnGameEnd.Add(() => Recorder.StopAfter(DELAY_AFTER_GAME_END_SECONDS));
             GameEvents.OnGameStart.Add(Recorder.StartRecording);
+            GameEvents.OnPlayerPlay.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerDraw.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerHandDiscard.Add((card) => OnPlayerAction());
             Connect();
         }
 
@@ -105,6 +116,29 @@ namespace RecorderPlugin
             }
 
             SettingsDialog.Focus();
+        }
+
+        private void OnPlayerAction()
+        {
+            if (idleTimer.Enabled)
+            {
+                idleTimer.Stop();
+            }
+
+            if (Recorder.IsRecordingPaused)
+            {
+                Log.Info("Resuming recording due to player action.");
+                Recorder.ResumeRecord();
+            }
+
+            Log.Info("Player action detected, restarting idle timer.");
+            idleTimer.Start();
+        }
+
+        private void OnIdleTimeElapsed(object sender, ElapsedEventArgs e)
+        {
+            Log.Info("Idle time threshold reached, pausing recording.");
+            Recorder.PauseRecord();
         }
 
         private static class Toasts

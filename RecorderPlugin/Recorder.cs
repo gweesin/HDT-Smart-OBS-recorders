@@ -33,7 +33,8 @@ namespace RecorderPlugin
                 throw new AuthorizationFailedException();
             }
 
-            await Task.Delay(3000); // wait 3 sec to promise success because OBS.ConnectAsync is an async function but not awaitable
+            await Task.Delay(
+                3000); // wait 3 sec to promise success because OBS.ConnectAsync is an async function but not awaitable
             if (!OBS.IsConnected)
             {
                 throw new ConnectionFailedException();
@@ -78,6 +79,31 @@ namespace RecorderPlugin
             {
                 NextStopTime = 0;
                 StopRecording();
+            }
+        }
+
+        internal void PauseRecord()
+        {
+            if (OBS.IsConnected && OBS.GetRecordStatus().IsRecording)
+            {
+                Debug.WriteLine("About to pause recording.");
+                OBS.PauseRecord();
+                Debug.WriteLine("Recording paused.");
+            }
+        }
+
+        internal Boolean IsRecordingPaused
+        {
+            get { return OBS.GetRecordStatus().IsRecordingPaused; }
+        }
+
+        internal void ResumeRecord()
+        {
+            if (OBS.IsConnected && OBS.GetRecordStatus().IsRecordingPaused)
+            {
+                Debug.WriteLine("About to resume recording.");
+                OBS.ResumeRecord();
+                Debug.WriteLine("Recording resumed.");
             }
         }
 
