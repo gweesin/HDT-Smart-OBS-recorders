@@ -95,6 +95,38 @@ namespace RecorderPlugin
             GameEvents.OnPlayerPlay.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerDraw.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerHandDiscard.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerDeckDiscard.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerPlayToDeck.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerPlayToHand.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerPlayToGraveyard.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerCreateInDeck.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerCreateInPlay.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerJoustReveal.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerDeckToPlay.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerHeroPower.Add(() => OnPlayerAction());
+            GameEvents.OnPlayerFatigue.Add((fatigue) => OnPlayerAction());
+            GameEvents.OnPlayerMinionMouseOver.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerHandMouseOver.Add((card) => OnPlayerAction());
+            GameEvents.OnPlayerMinionAttack.Add((attackInfo) => OnPlayerAction());
+
+            GameEvents.OnOpponentPlay.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentDraw.Add(() => OnPlayerAction());
+            GameEvents.OnOpponentHandDiscard.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentDeckDiscard.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentPlayToDeck.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentHandToDeck.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentPlayToHand.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentPlayToGraveyard.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentSecretTriggered.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentCreateInDeck.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentCreateInPlay.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentJoustReveal.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentDeckToPlay.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentHeroPower.Add(() => OnPlayerAction());
+            GameEvents.OnOpponentFatigue.Add((fatigue) => OnPlayerAction());
+            GameEvents.OnOpponentMinionMouseOver.Add((card) => OnPlayerAction());
+            GameEvents.OnOpponentMinionAttack.Add((attackInfo) => OnPlayerAction());
+
             Connect();
         }
 
