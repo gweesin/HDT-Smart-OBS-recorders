@@ -21,7 +21,7 @@ namespace RecorderPlugin
         private Timer idleTimer;
 
         public string ButtonText => "Settings";
-        public string Name => "Hearthstone OBS recorder";
+        public string Name => "Hearthstone Smart OBS recorder";
         public string Author => "gweesin";
 
         public string Description =>
