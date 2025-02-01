@@ -8,8 +8,8 @@ jobs:
     env:
       DLLPath: .\RecorderPlugin\bin\Release\RecorderPlugin.dll
       BuildDir: .\RecorderPlugin\bin\Release
-      HDTDownloadURL: https://github.com/HearthSim/Hearthstone-Deck-Tracker/releases/download/v1.25.3/Hearthstone.Deck.Tracker-v1.25.3.zip
-      HDTZipName: Hearthstone.Deck.Tracker-v1.25.3.zip
+      HDTDownloadURL: https://github.com/HearthSim/Hearthstone-Deck-Tracker/releases/download/v1.38.6/Hearthstone.Deck.Tracker-v1.38.6.zip
+      HDTZipName: Hearthstone.Deck.Tracker-v1.38.6.zip
     steps:
       - uses: actions/checkout@v2
 
