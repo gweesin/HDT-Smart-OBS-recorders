@@ -28,7 +28,8 @@ jobs:
         run: |
           choco install netfx-4.7.2-devpack -y
 
-      - run: nuget restore
+      - name: Restore dependencies
+        run: dotnet restore
         
       - name: check installed packages
         run: dotnet list RecorderPlugin package
