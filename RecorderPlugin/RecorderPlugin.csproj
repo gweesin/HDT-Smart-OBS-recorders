@@ -38,7 +38,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="5.0.0" />
+    <PackageReference Include="Costura.Fody" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reactive" Version="6.0.0" />
+    <PackageReference Include="Websocket.Client" Version="4.7.0" />
     <Reference Include="HearthDb">
       <HintPath>..\Hearthstone Deck Tracker\HearthDb.dll</HintPath>
       <Private>False</Private>
