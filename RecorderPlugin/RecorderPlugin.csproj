@@ -42,6 +42,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="obs-websocket-dotnet" Version="5.0.0.3" />
     <PackageReference Include="System.Reactive" Version="6.0.0" />
     <PackageReference Include="Websocket.Client" Version="4.7.0" />
     <Reference Include="HearthDb">
