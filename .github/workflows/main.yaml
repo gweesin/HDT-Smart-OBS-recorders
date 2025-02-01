@@ -24,6 +24,10 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Install .NET Framework Developer Pack
+        run: |
+          choco install netfx-4.7.2-devpack -y
+
       - run: nuget restore
 
       - run: dotnet build -c Release
