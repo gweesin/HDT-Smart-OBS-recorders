@@ -11,7 +11,7 @@
 
 ## 📦 安装
 
-1. 从[最新发布](https://github.com/darksworm/hearthstone-obs-recorder/releases/latest)下载插件 DLL 文件
+1. 从[最新发布](https://github.com/gweesin/HDT-Smart-OBS-recorders/releases/latest)下载插件 DLL 文件
 2. 按照 [HDT 插件安装指南](https://github.com/HearthSim/Hearthstone-Deck-Tracker/wiki/Available-Plugins)进行安装
 
 ### 如何在 OBS Studio 中启用 WebSocket 服务器

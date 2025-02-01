@@ -16,7 +16,7 @@ To use this you will need:
 
 ## 📦 Install
 
-1. Download the plugin DLL file from the [latest release](https://github.com/darksworm/hearthstone-obs-recorder/releases/latest)
+1. Download the plugin DLL file from the [latest release](https://github.com/gweesin/HDT-Smart-OBS-recorders/releases/latest)
 2. Follow the [HDT plugin installation guide](https://github.com/HearthSim/Hearthstone-Deck-Tracker/wiki/Available-Plugins)
 
 ### How to enable websocket server in OBS Studio
