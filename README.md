@@ -25,3 +25,13 @@ To use this you will need:
 2. Click **Enable Websocket Server** in the **Plugin Settings** zoom
 3. Set **Server Port** as 4444 and disabled Authentication
 4. Now Click the **Apply** button in the bottom zoom to save configuration
+
+### Add transition between Pause and Resume in OBS Studio
+
+!\[Experimental\] 
+
+download ScreenSwitcher from [here](https://github.com/WarmUpTill/SceneSwitcher)
+
+Learn more info from [wiki](https://github.com/WarmUpTill/SceneSwitcher/wiki)
+
+discussions in [reddit - is it possible to automatically add transitions](https://www.reddit.com/r/obs/comments/uce4r8/is_it_possible_to_automatically_add_transitions/)
