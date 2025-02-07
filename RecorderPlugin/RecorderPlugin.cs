@@ -11,14 +11,14 @@ namespace RecorderPlugin
 {
     public class RecorderPlugin : IPlugin
     {
-        private const int DELAY_AFTER_GAME_END_SECONDS = 10;
+        private const int DelayAfterGameEndSeconds = 10;
 
         // setting idle threshold
-        private const int IDLE_TIME_THRESHOLD_SECONDS = 5;
-        private readonly Recorder Recorder = new Recorder();
-        private readonly SettingsDialog SettingsDialog;
-        private readonly SettingStore SettingStore = new SettingStore();
-        private Timer idleTimer;
+        private const int IdleTimeThresholdSeconds = 5;
+        private readonly Recorder _recorder = new Recorder();
+        private readonly SettingsDialog _settingsDialog;
+        private readonly SettingStore _settingStore = new SettingStore();
+        private readonly Timer _idleTimer;
 
         public string ButtonText => "Settings";
         public string Name => "Hearthstone Smart OBS recorder";
@@ -35,25 +35,25 @@ namespace RecorderPlugin
         {
             if (SettingStore.Load() is SettingStore.Settings settings)
             {
-                Recorder.UpdateSettings(settings.IPAddress, settings.Port, settings.Password);
-                SettingsDialog = new SettingsDialog(settings.IPAddress, settings.Port, settings.Password);
+                _recorder.UpdateSettings(settings.IpAddress, settings.Port, settings.Password);
+                _settingsDialog = new SettingsDialog(settings.IpAddress, settings.Port, settings.Password);
             }
             else
             {
-                SettingsDialog = new SettingsDialog("127.0.0.1", "4444", "");
-                Recorder.UpdateSettings("127.0.0.1", "4444", "");
+                _settingsDialog = new SettingsDialog("127.0.0.1", "4444", "");
+                _recorder.UpdateSettings("127.0.0.1", "4444", "");
             }
 
-            SettingsDialog.SettingsChanged += OnSettingsChanged;
+            _settingsDialog.SettingsChanged += OnSettingsChanged;
 
-            idleTimer = new Timer(IDLE_TIME_THRESHOLD_SECONDS * 1000);
-            idleTimer.Elapsed += OnIdleTimeElapsed;
-            idleTimer.AutoReset = false;
+            _idleTimer = new Timer(IdleTimeThresholdSeconds * 1000);
+            _idleTimer.Elapsed += OnIdleTimeElapsed;
+            _idleTimer.AutoReset = false;
         }
 
         private void OnSettingsChanged(object _, SettingsDialog.SettingsChangedEvent e)
         {
-            Recorder.UpdateSettings(e.IPAddress, e.Port, e.Password);
+            _recorder.UpdateSettings(e.IPAddress, e.Port, e.Password);
 
             if (!Connect())
             {
@@ -61,14 +61,14 @@ namespace RecorderPlugin
             }
 
             SettingStore.Save(e.IPAddress, e.Port, e.Password);
-            SettingsDialog.Close();
+            _settingsDialog.Close();
         }
 
         private bool Connect()
         {
             try
             {
-                Recorder.Connect();
+                _recorder.Connect();
             }
             catch (Recorder.ConnectionFailedException ex)
             {
@@ -90,8 +90,8 @@ namespace RecorderPlugin
 
         public void OnLoad()
         {
-            GameEvents.OnGameEnd.Add(() => Recorder.StopAfter(DELAY_AFTER_GAME_END_SECONDS));
-            GameEvents.OnGameStart.Add(Recorder.StartRecording);
+            GameEvents.OnGameEnd.Add(() => _recorder.StopAfter(DelayAfterGameEndSeconds));
+            GameEvents.OnGameStart.Add(_recorder.StartRecording);
             GameEvents.OnPlayerPlay.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerDraw.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerHandDiscard.Add((card) => OnPlayerAction());
@@ -103,14 +103,14 @@ namespace RecorderPlugin
             GameEvents.OnPlayerCreateInPlay.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerJoustReveal.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerDeckToPlay.Add((card) => OnPlayerAction());
-            GameEvents.OnPlayerHeroPower.Add(() => OnPlayerAction());
+            GameEvents.OnPlayerHeroPower.Add(OnPlayerAction);
             GameEvents.OnPlayerFatigue.Add((fatigue) => OnPlayerAction());
             GameEvents.OnPlayerMinionMouseOver.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerHandMouseOver.Add((card) => OnPlayerAction());
             GameEvents.OnPlayerMinionAttack.Add((attackInfo) => OnPlayerAction());
 
             GameEvents.OnOpponentPlay.Add((card) => OnPlayerAction());
-            GameEvents.OnOpponentDraw.Add(() => OnPlayerAction());
+            GameEvents.OnOpponentDraw.Add(OnPlayerAction);
             GameEvents.OnOpponentHandDiscard.Add((card) => OnPlayerAction());
             GameEvents.OnOpponentDeckDiscard.Add((card) => OnPlayerAction());
             GameEvents.OnOpponentPlayToDeck.Add((card) => OnPlayerAction());
@@ -122,7 +122,7 @@ namespace RecorderPlugin
             GameEvents.OnOpponentCreateInPlay.Add((card) => OnPlayerAction());
             GameEvents.OnOpponentJoustReveal.Add((card) => OnPlayerAction());
             GameEvents.OnOpponentDeckToPlay.Add((card) => OnPlayerAction());
-            GameEvents.OnOpponentHeroPower.Add(() => OnPlayerAction());
+            GameEvents.OnOpponentHeroPower.Add(OnPlayerAction);
             GameEvents.OnOpponentFatigue.Add((fatigue) => OnPlayerAction());
             GameEvents.OnOpponentMinionMouseOver.Add((card) => OnPlayerAction());
             GameEvents.OnOpponentMinionAttack.Add((attackInfo) => OnPlayerAction());
@@ -132,45 +132,45 @@ namespace RecorderPlugin
 
         public void OnUnload()
         {
-            Recorder.Unload();
+            _recorder.Unload();
         }
 
         public void OnUpdate()
         {
-            Recorder.Update();
+            _recorder.Update();
         }
 
         public void OnButtonPress()
         {
-            if (!SettingsDialog.Visible)
+            if (!_settingsDialog.Visible)
             {
-                SettingsDialog.ShowDialog();
+                _settingsDialog.ShowDialog();
             }
 
-            SettingsDialog.Focus();
+            _settingsDialog.Focus();
         }
 
         private void OnPlayerAction()
         {
-            if (idleTimer.Enabled)
+            if (_idleTimer.Enabled)
             {
-                idleTimer.Stop();
+                _idleTimer.Stop();
             }
 
-            if (Recorder.IsRecordingPaused)
+            if (_recorder.IsRecordingPaused)
             {
                 Log.Info("Resuming recording due to player action.");
-                Recorder.ResumeRecord();
+                _recorder.ResumeRecord();
             }
 
             Log.Info("Player action detected, restarting idle timer.");
-            idleTimer.Start();
+            _idleTimer.Start();
         }
 
         private void OnIdleTimeElapsed(object sender, ElapsedEventArgs e)
         {
             Log.Info("Idle time threshold reached, pausing recording.");
-            Recorder.PauseRecord();
+            _recorder.PauseRecord();
         }
 
         private static class Toasts
@@ -189,13 +189,15 @@ namespace RecorderPlugin
 
             public static System.Windows.Controls.UserControl MakeErrorToast(string error)
             {
-                var content = new System.Windows.Controls.UserControl();
-                content.Background = (Brush)(new BrushConverter()).ConvertFromString("#a20010");
-                content.Content = error;
-                content.Foreground = Brushes.White;
-                content.FontSize = 36;
-                content.FontFamily = new FontFamily("Arial");
-                content.Padding = new System.Windows.Thickness(12);
+                var content = new System.Windows.Controls.UserControl
+                {
+                    Background = (Brush)(new BrushConverter()).ConvertFromString("#a20010"),
+                    Content = error,
+                    Foreground = Brushes.White,
+                    FontSize = 36,
+                    FontFamily = new FontFamily("Arial"),
+                    Padding = new System.Windows.Thickness(12)
+                };
                 return content;
             }
         }

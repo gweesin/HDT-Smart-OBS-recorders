@@ -7,25 +7,25 @@ namespace RecorderPlugin
 {
     internal class SettingStore
     {
-        private string DataDir => Path.Combine(HDT.Config.Instance.DataDir, "OBSRecorder");
+        private static string DataDir => Path.Combine(HDT.Config.Instance.DataDir, "OBSRecorder");
 
-        private readonly string ConfigFile = "OBSRecorder.json";
+        private const string ConfigFile = "OBSRecorder.json";
 
-        private string ConfigFilePath => Path.Combine(DataDir, ConfigFile);
+        private static string ConfigFilePath => Path.Combine(DataDir, ConfigFile);
 
-        public void Save(string ip, string port, string password)
+        public static void Save(string ip, string port, string password)
         {
             if (!Directory.Exists(DataDir))
             {
                 Directory.CreateDirectory(DataDir);
             }
 
-            Settings config = new Settings { IPAddress = ip, Port = port, Password = password };
+            Settings config = new Settings { IpAddress = ip, Port = port, Password = password };
             string json = JsonConvert.SerializeObject(config, Formatting.Indented);
             File.WriteAllText(ConfigFilePath, json);
         }
 
-        public Settings? Load()
+        public static Settings? Load()
         {
             try
             {
@@ -41,7 +41,7 @@ namespace RecorderPlugin
 
         public struct Settings
         {
-            public string IPAddress;
+            public string IpAddress;
             public string Port;
             public string Password;
         }

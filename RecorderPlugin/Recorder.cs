@@ -15,18 +15,18 @@ namespace RecorderPlugin
         {
         }
 
-        OBSWebsocket OBS = new OBSWebsocket();
+        private readonly OBSWebsocket _obs = new OBSWebsocket();
 
-        private long NextStopTime = 0;
+        private long _nextStopTime = 0;
 
-        private string ConnectionString = String.Empty;
-        private string Password = String.Empty;
+        private string _connectionString = String.Empty;
+        private string _password = String.Empty;
 
         public async void Connect()
         {
             try
             {
-                OBS.ConnectAsync(ConnectionString, Password);
+                _obs.ConnectAsync(_connectionString, _password);
             }
             catch (AuthFailureException)
             {
@@ -35,7 +35,7 @@ namespace RecorderPlugin
 
             await Task.Delay(
                 3000); // wait 3 sec to promise success because OBS.ConnectAsync is an async function but not awaitable
-            if (!OBS.IsConnected)
+            if (!_obs.IsConnected)
             {
                 throw new ConnectionFailedException();
             }
@@ -43,78 +43,77 @@ namespace RecorderPlugin
 
         public void UpdateSettings(string ip, string port, string password = "")
         {
-            ConnectionString = $"ws://{ip}:{port}";
-            Password = password;
+            _connectionString = $"ws://{ip}:{port}";
+            _password = password;
         }
 
         internal void StartRecording()
         {
-            if (NextStopTime > 0)
+            if (_nextStopTime > 0)
             {
-                NextStopTime = 0;
+                _nextStopTime = 0;
                 StopRecording();
             }
 
-            if (OBS.IsConnected)
+            if (_obs.IsConnected)
             {
                 Debug.WriteLine("About to start recording.");
-                OBS.StartRecord();
+                _obs.StartRecord();
                 Debug.WriteLine("Recording started.");
             }
         }
 
         internal void StopAfter(long millis)
         {
-            NextStopTime = Timestamp + millis;
+            _nextStopTime = Timestamp + millis;
         }
 
         internal void Unload()
         {
-            OBS.Disconnect();
+            _obs.Disconnect();
         }
 
         internal void Update()
         {
-            if (NextStopTime > 0 && (Timestamp > NextStopTime || Hearthstone_Deck_Tracker.API.Core.Game.IsInMenu))
+            if (_nextStopTime > 0 && (Timestamp > _nextStopTime || Hearthstone_Deck_Tracker.API.Core.Game.IsInMenu))
             {
-                NextStopTime = 0;
+                _nextStopTime = 0;
                 StopRecording();
             }
         }
 
         internal void PauseRecord()
         {
-            if (OBS.IsConnected && OBS.GetRecordStatus().IsRecording)
+            if (_obs.IsConnected && _obs.GetRecordStatus().IsRecording)
             {
                 Debug.WriteLine("About to pause recording.");
-                OBS.PauseRecord();
+                _obs.PauseRecord();
                 Debug.WriteLine("Recording paused.");
             }
         }
 
-        internal Boolean IsRecordingPaused
-        {
-            get { return OBS.GetRecordStatus().IsRecordingPaused; }
-        }
+        internal Boolean IsRecordingPaused => _obs.GetRecordStatus().IsRecordingPaused;
 
         internal void ResumeRecord()
         {
-            if (OBS.IsConnected && OBS.GetRecordStatus().IsRecordingPaused)
+            if (!_obs.IsConnected || !_obs.GetRecordStatus().IsRecordingPaused)
             {
-                Debug.WriteLine("About to resume recording.");
-                OBS.ResumeRecord();
-                Debug.WriteLine("Recording resumed.");
+                return;
             }
+
+            Debug.WriteLine("About to resume recording.");
+            _obs.ResumeRecord();
+            Debug.WriteLine("Recording resumed.");
         }
 
         private long Timestamp => new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
         private void StopRecording()
         {
-            if (OBS.IsConnected && OBS.GetRecordStatus().IsRecording)
+            if (_obs.IsConnected && _obs.GetRecordStatus().IsRecording)
             {
                 Debug.WriteLine("About to stop recording.");
-                OBS.StopRecord();
+                _obs.StopRecord();
                 Debug.WriteLine("Recording stopped.");
             }
         }
